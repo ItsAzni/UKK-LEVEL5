@@ -1,30 +1,9 @@
 <?php
 
-$connection = mysqli_connect("localhost", "root", "", "ukklv5");
+// Membuat koneksi ke database
+$koneksi = mysqli_connect("localhost", "root", "", "ukklv5");
 
-if (!$connection) {
+// Cek koneksi, jika gagal tampilkan pesan error
+if (!$koneksi) {
     die("Database connection failed: " . mysqli_connect_error());
-}
-
-session_start();
-
-function isLoggedIn()
-{
-    return isset($_SESSION['user_id']);
-}
-
-function requireLogin()
-{
-    if (!isLoggedIn()) {
-        header("Location: auth.php");
-        exit();
-    }
-}
-
-function logout()
-{
-    session_unset();
-    session_destroy();
-    header("Location: auth.php");
-    exit();
 }

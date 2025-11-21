@@ -1,21 +1,25 @@
 <?php
 
-include 'db.php';
+include 'fungsi.php';
 
-if (isset($_GET['logout'])) logout();
-if (isLoggedIn()) header("Location: index.php");
+// Jika sudah login, redirect ke index
+if (isLoggedIn()) {
+    header("Location: index.php");
+    exit();
+}
 
+// Proses login jika ada request POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $stmt = $connection->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $user = $stmt->get_result()->fetch_assoc();
-
+    // Ambil data user berdasarkan username
+    $user = $koneksi->query("SELECT * FROM users WHERE username = '$username'")->fetch_assoc();
+    
+    // Verifikasi password
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_role'] = $user['role'];
         header("Location: index.php");
         exit();
     }

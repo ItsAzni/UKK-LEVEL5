@@ -1,10 +1,13 @@
 <?php
 
 include 'db.php';
+include 'fungsi.php';
 
+// Cek login
 requireLogin();
 
-$transaksi = $connection->query("SELECT t.*, b.nama FROM transaksi t JOIN barang b ON t.id_barang = b.id ORDER BY t.tanggal DESC")->fetch_all(MYSQLI_ASSOC);
+// Ambil data transaksi digabung dengan data barang
+$transaksi = $koneksi->query("SELECT t.*, b.nama FROM transaksi t JOIN barang b ON t.id_barang = b.id ORDER BY t.tanggal DESC")->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -21,7 +24,10 @@ $transaksi = $connection->query("SELECT t.*, b.nama FROM transaksi t JOIN barang
         <nav style="display: flex; gap: 15px;">
             <a href="index.php">📦Barang</a>
             <a href="transaksi.php">📝Transaksi</a>
-            <a href="auth.php?logout=1" style="color: red;">🚪Logout</a>
+            <?php if (isSuperAdmin()): ?>
+                <a href="users.php">👥Users</a>
+            <?php endif; ?>
+            <a href="logout.php" style="color: red;">🚪Logout</a>
         </nav>
 
         <h2 style="margin: 20px 0;">Riwayat Transaksi</h2>

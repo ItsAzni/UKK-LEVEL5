@@ -1,16 +1,19 @@
 <?php
 
-include 'db.php';
+include 'fungsi.php';
 
+// Cek login
 requireLogin();
 
 $id = $_GET['id'] ?? null;
 $data = null;
 
+// Jika ada ID, ambil data barang untuk diedit
 if ($id) {
-    $data = $connection->query("SELECT * FROM barang WHERE id = $id")->fetch_assoc();
+    $data = $koneksi->query("SELECT * FROM barang WHERE id = $id")->fetch_assoc();
 }
 
+// Proses simpan data (Tambah/Edit)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = $_POST['nama'];
     $deskripsi = $_POST['deskripsi'];
@@ -19,11 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lokasi = $_POST['lokasi'];
     $kode = $_POST['kode'];
 
-    if ($id) {
-        $stmt = $connection->prepare("UPDATE barang SET nama=?, deskripsi=?, jumlah=?, jumlah_tersedia=?, lokasi=?, kode=? WHERE id=?");
+    if ($id && $data) {
+        // Update data barang
+        $stmt = $koneksi->prepare("UPDATE barang SET nama=?, deskripsi=?, jumlah=?, jumlah_tersedia=?, lokasi=?, kode=? WHERE id=?");
         $stmt->bind_param("ssiiisi", $nama, $deskripsi, $jumlah, $jumlah_tersedia, $lokasi, $kode, $id);
     } else {
-        $stmt = $connection->prepare("INSERT INTO barang (nama, deskripsi, jumlah, jumlah_tersedia, lokasi, kode) VALUES (?, ?, ?, ?, ?, ?)");
+        // Insert data barang baru
+        $stmt = $koneksi->prepare("INSERT INTO barang (nama, deskripsi, jumlah, jumlah_tersedia, lokasi, kode) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssiiis", $nama, $deskripsi, $jumlah, $jumlah_tersedia, $lokasi, $kode);
     }
 

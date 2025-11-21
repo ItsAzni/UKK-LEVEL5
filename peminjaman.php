@@ -1,29 +1,38 @@
 <?php
 
-include 'db.php';
+include 'fungsi.php';
 
+// Cek login
 requireLogin();
 
 $id = $_GET['id'];
 $action = $_GET['action']; // 'pinjam' or 'kembali'
-$item = $connection->query("SELECT * FROM barang WHERE id = $id")->fetch_assoc();
+// Ambil data barang yang akan dipinjam/dikembalikan
+$item = $koneksi->query("SELECT * FROM barang WHERE id = $id")->fetch_assoc();
 
+// Proses transaksi
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $peminjam = $_POST['peminjam'];
     $jumlah = $_POST['jumlah'];
     $catatan = $_POST['catatan'];
 
+    // Validasi jumlah
     $valid = true;
     if ($action == 'pinjam' && $jumlah > $item['jumlah_tersedia']) $valid = false;
     if ($action == 'kembali' && $jumlah > ($item['jumlah'] - $item['jumlah_tersedia'])) $valid = false;
 
     if ($valid) {
-        $stmt = $connection->prepare("INSERT INTO transaksi (id_barang, peminjam, jumlah, kategori, catatan) VALUES (?, ?, ?, ?, ?)");
+        // Simpan riwayat transaksi
+        $stmt = $koneksi->prepare("INSERT INTO transaksi (id_barang, peminjam, jumlah, kategori, catatan) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("isiss", $id, $peminjam, $jumlah, $action, $catatan);
         $stmt->execute();
 
-        $operator = ($action == 'pinjam') ? '-' : '+';
-        $connection->query("UPDATE barang SET jumlah_tersedia = jumlah_tersedia $operator $jumlah WHERE id = $id");
+        // Update stok barang
+        if ($action == 'pinjam') {
+            $koneksi->query("UPDATE barang SET jumlah_tersedia = jumlah_tersedia - '$jumlah' WHERE id = '$id'");
+        } else {
+            $koneksi->query("UPDATE barang SET jumlah_tersedia = jumlah_tersedia + '$jumlah' WHERE id = '$id'");
+        }
 
         header("Location: transaksi.php");
         exit();
