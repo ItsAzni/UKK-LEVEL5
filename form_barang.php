@@ -25,11 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($id && $data) {
         // Update data barang
         $stmt = $koneksi->prepare("UPDATE barang SET nama=?, deskripsi=?, jumlah=?, jumlah_tersedia=?, lokasi=?, kode=? WHERE id=?");
-        $stmt->bind_param("ssiiisi", $nama, $deskripsi, $jumlah, $jumlah_tersedia, $lokasi, $kode, $id);
+        $stmt->bind_param("ssiissi", $nama, $deskripsi, $jumlah, $jumlah_tersedia, $lokasi, $kode, $id);
     } else {
         // Insert data barang baru
         $stmt = $koneksi->prepare("INSERT INTO barang (nama, deskripsi, jumlah, jumlah_tersedia, lokasi, kode) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssiiis", $nama, $deskripsi, $jumlah, $jumlah_tersedia, $lokasi, $kode);
+        $stmt->bind_param("ssiiss", $nama, $deskripsi, $jumlah, $jumlah_tersedia, $lokasi, $kode);
     }
 
     $stmt->execute();
